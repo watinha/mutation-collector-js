@@ -1,4 +1,25 @@
 var EventController = (function () {
+    var true_addEventListener = HTMLElement.prototype.addEventListener;
+    window.events = [];
+    HTMLElement.prototype.addEventListener = function (ev_type) {
+        var target = this,
+            selector = "";
+
+        while (target.parentElement != null) {
+            selector = (selector.length === 0 ?
+                target.tagName.toLowerCase() :
+                target.tagName.toLowerCase() + " > " + selector);
+            target = target.parentElement;
+        }
+        if (selector.length > 0) {
+            window.events.push({
+                event: ev_type,
+                selector: selector
+            });
+        }
+        true_addEventListener.apply(this, arguments);
+    };
+
     return {
         get: function () {
             var all = document.querySelectorAll("*"),
