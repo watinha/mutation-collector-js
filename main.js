@@ -22,8 +22,10 @@ page.onInitialized = function () {
                 target = target.parentElement;
             }
             if (selector.length > 0) {
-                selector = ev_type + " --> " + selector;
-                window.events.push(selector);
+                window.events.push({
+                    event: ev_type,
+                    selector: selector
+                });
             }
             true_addEventListener.apply(this, arguments);
         };
@@ -36,28 +38,14 @@ page.settings.XSSAuditingEnabled = true;
 page.settings.webSecurityEnabled = false;
 page.open(system.args[1], function () {
     page.navigationLocked = true;
+    page.injectJs("page-mod/event-controller.js");
     setTimeout(function () {
-        console.log(page.evaluate(function () {
-            var all = document.querySelectorAll("*");
-            for (var l = 0; l < all.length; l++) {
-                if (all[l].onmouseover) {
-                    var target = all[l],
-                        selector = "";
-
-                    while (target.parentElement != null) {
-                        selector = (selector.length === 0 ?
-                            target.tagName.toLowerCase() :
-                            target.tagName.toLowerCase() + " > " + selector);
-                        target = target.parentElement;
-                    }
-                    if (selector.length > 0)
-                        window.events.push(selector);
-                }
-            };
-
-            return window.events.join("\n");
-        }));
-        page.render("abobrinha.png");
+        var event_controller_list = page.evaluate(function () {
+            return window.EventController.get();
+        });
+        for (var i = 0; i < event_controller_list.length; i++) {
+            console.log(event_controller_list[i].event + " *** " + event_controller_list[i].selector);
+        }
         phantom.exit();
     }, 10000);
 });
