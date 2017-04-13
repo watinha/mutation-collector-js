@@ -44,6 +44,7 @@ page.settings.webSecurityEnabled = false;
 page.onError = function () {};
 page.onInitialized = function () {
     page.injectJs("page-mod/event-controller.js");
+    page.injectJs("page-mod/mutation-controller.js");
 };
 
 page.open(system.args[1], function () {
