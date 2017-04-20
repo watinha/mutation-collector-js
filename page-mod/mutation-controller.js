@@ -1,5 +1,5 @@
 (function () {
-    window.WindowController = (function () {
+    window.MutationController = (function () {
         var added_elements = [],
             all_elements = null;
 
