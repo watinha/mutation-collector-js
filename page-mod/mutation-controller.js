@@ -7,7 +7,8 @@
             left: (element.offsetLeft + parent_element.left),
             top: (element.offsetTop + parent_element.top),
             width: element.offsetWidth,
-            height: element.offsetHeight
+            height: element.offsetHeight,
+            html: element.outerHTML
         };
     };
     window.MutationController = (function () {

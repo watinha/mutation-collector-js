@@ -1,5 +1,6 @@
 var webpage = require("webpage"),
     system = require("system"),
+    fs = require("fs"),
     page = webpage.create();
 
 if (system.args.length < 2) {
@@ -60,7 +61,7 @@ page.open(system.args[1], function () {
             };
             return result;
         });
-        page.render("output/01.png");
+        page.render("output/XXXXX1.png");
         for (var i = 0; i < target_list.length; i++) {
             (function () {
                 var target = target_list[i],
@@ -76,8 +77,15 @@ page.open(system.args[1], function () {
                          var mutations = page.evaluate(function () {
                              return window.MutationController.check_mutation_changes();
                          });
-                         if (mutations.length > 0)
+                         if (mutations.length > 0) {
+                             var output = "";
+                             for (var i = 0; i < mutations.length; i++) {
+                                 output += mutations[i].html + " ** *** ** " + index + "-" + i + "\n";
+                             };
+                             fs.write('output/' + index + '.activator.txt', target.html, 'w');
+                             fs.write('output/' + index + '.widgets.txt', output, 'w');
                              page.render("output/" + index + ".png");
+                         }
                      }, {}, 1000);
                 }
             })();
