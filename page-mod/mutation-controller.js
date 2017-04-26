@@ -1,4 +1,15 @@
 (function () {
+    window.position = function (element) {
+        if (element.parentElement == null)
+            return { left: element.offsetLeft, top: element.offsetTop };
+        var parent_element = window.position(element.parentElement);
+        return {
+            left: (element.offsetLeft + parent_element.left),
+            top: (element.offsetTop + parent_element.top),
+            width: element.offsetWidth,
+            height: element.offsetHeight
+        };
+    };
     window.MutationController = (function () {
         var added_elements = [],
             all_elements = null;
@@ -124,17 +135,7 @@
         function _presence_of_element (element, tagName) {
             return (element.querySelectorAll(tagName).length !== 0);
         }
-        function _position(element) {
-            if (element.parentElement == null)
-                return { left: element.offsetLeft, top: element.offsetTop };
-            var parent_element = _position(element.parentElement);
-            return {
-                left: (element.offsetLeft + parent_element.left),
-                top: (element.offsetTop + parent_element.top),
-                width: element.offsetWidth,
-                height: element.offsetHeight
-            };
-        }
+        _position = window.position;
         function _contains (target, element) {
             if (target === null)
                 return false;

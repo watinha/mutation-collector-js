@@ -43,22 +43,45 @@ page.settings.XSSAuditingEnabled = true;
 page.settings.webSecurityEnabled = false;
 page.onError = function () {};
 page.onInitialized = function () {
-    page.injectJs("page-mod/event-controller.js");
     page.injectJs("page-mod/mutation-controller.js");
 };
 
 page.open(system.args[1], function () {
     page.navigationLocked = true;
-    var chain = CommandChain();
-    chain.add(function () {
-        var event_controller_list = page.evaluate(function () {
-            return window.EventController.get();
+    var chain = CommandChain(),
+        target_list;
+    setTimeout(function () {
+        target_list = page.evaluate(function () {
+            window.all = document.querySelectorAll("*"),
+                result = [];
+            for (var i = 0; i < window.all.length; i++) {
+                result.push(window.position(window.all[i]));
+            };
+            return result;
         });
-        for (var i = 0; i < event_controller_list.length; i++) {
-            console.log(event_controller_list[i].event + " *** " + event_controller_list[i].selector);
+        page.render("output/01.png");
+        for (var i = 0; i < target_list.length; i++) {
+            (function () {
+                var target = target_list[i],
+                    index = i;
+                if (target.width && target.height) {
+                     chain.add(function () {
+                         page.sendEvent("mousemove", target.left + 1, target.top + 1);
+                         console.log(target.left + " " + target.top)
+                     }, {}, 1000);
+                     chain.add(function () {
+                         page.sendEvent("click", target.left + 1, target.top + 1);
+                     }, {}, 1000);
+                     chain.add(function () {
+                         page.render("output/" + index + ".png");
+                     }, {}, 1000);
+                }
+            })();
         }
-        phantom.exit();
+        chain.add(function () {
+            phantom.exit();
+        }, {}, 500);
 
-    }, {}, 10000);
-    chain.run();
+        chain.run();
+    }, 5000);
 });
