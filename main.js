@@ -51,7 +51,8 @@ page.open(system.args[1], function () {
     page.navigationLocked = true;
     page.injectJs("page-mod/mutation-controller.js");
     var chain = CommandChain(),
-        target_list;
+        target_list,
+        mutations_list = [];
     setTimeout(function () {
         target_list = page.evaluate(function () {
             window.all = document.querySelectorAll("*"),
@@ -81,6 +82,10 @@ page.open(system.args[1], function () {
                              var output = "";
                              for (var i = 0; i < mutations.length; i++) {
                                  output += mutations[i].html + " ** *** ** " + index + "-" + i + "\n";
+                                 mutations[i].activatorId = index;
+                                 mutations[i].changeId = i;
+                                 mutations[i].activator = target;
+                                 mutations_list.push(mutations[i]);
                              };
                              fs.write('output/' + index + '.activator.txt', target.html, 'w');
                              fs.write('output/' + index + '.widgets.txt', output, 'w');
@@ -91,6 +96,48 @@ page.open(system.args[1], function () {
             })();
         }
         chain.add(function () {
+            var csv = 'activator-id,mutation-id,displayed,height,width,top,left,activatorTop,activatorLeft,distanceTop,distanceLeft,distance,numberElements,elements/size,numberWords,textNodes,Words/TextNodes,table,list,input,widgetName,date,img,proportionNumbers,links80percent,Result\n',
+                row, serial, distanceTop, distanceLeft, distance;
+            for (var i = 0; i < mutations_list.length; i++) {
+                row = mutations_list[i];
+                serial = [];
+                serial.push(row.activatorId);
+                serial.push(row.changeId);
+                serial.push(0);
+                serial.push(row.height);
+                serial.push(row.width);
+                serial.push(row.top);
+                serial.push(row.left);
+                serial.push(row.activator.top);
+                serial.push(row.activator.left);
+                distanceTop = Math.abs(row.top - row.activator.top);
+                serial.push(distanceTop);
+                distanceLeft = Math.abs(row.left - row.activator.left);
+                serial.push(distanceLeft);
+                distance = Math.abs(Math.abs(distanceTop - distanceLeft) - Math.max(distanceTop, distanceLeft));
+                serial.push(distance);
+                serial.push(row.numberOfElements);
+                if (row.height * row.width == 0)
+                    serial.push(-1);
+                else
+                    serial.push(row.numberOfElements / (row.height * row.width));
+                serial.push(row.numberOfWords);
+                serial.push(row.numberTextNodes);
+                if (row.numberTextNodes === 0)
+                    serial.push(0);
+                else
+                    serial.push(row.numberOfWords / row.numberTextNodes);
+                serial.push(row.presenceTable);
+                serial.push(row.presenceUl);
+                serial.push(row.presenceInput);
+                serial.push(row.presenceWidgetName);
+                serial.push(row.presenceDate);
+                serial.push(row.presenceImg);
+                serial.push(row.proportionNumberTextNodes);
+                serial.push(row.percentLinks);
+                csv += serial.join(',') + '\n';
+            };
+            fs.write('output/results.csv', csv, 'w');
             phantom.exit();
         }, {}, 500);
 
