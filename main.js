@@ -48,6 +48,7 @@ page.onInitialized = function () {
 
 page.open(system.args[1], function () {
     page.navigationLocked = true;
+    page.injectJs("page-mod/mutation-controller.js");
     var chain = CommandChain(),
         target_list;
     setTimeout(function () {
@@ -67,13 +68,16 @@ page.open(system.args[1], function () {
                 if (target.width && target.height) {
                      chain.add(function () {
                          page.sendEvent("mousemove", target.left + 1, target.top + 1);
-                         console.log(target.left + " " + target.top)
                      }, {}, 1000);
                      chain.add(function () {
                          page.sendEvent("click", target.left + 1, target.top + 1);
                      }, {}, 1000);
                      chain.add(function () {
-                         page.render("output/" + index + ".png");
+                         var mutations = page.evaluate(function () {
+                             return window.MutationController.check_mutation_changes();
+                         });
+                         if (mutations.length > 0)
+                             page.render("output/" + index + ".png");
                      }, {}, 1000);
                 }
             })();
