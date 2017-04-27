@@ -20,6 +20,8 @@
             result.html = element.outerHTML;
             result.numberOfElements = _number_of_elements(element);
             result.numberOfWords = _number_of_words(element);
+            result.depth = _depth(element);
+            result.wide = _wide(element);
 
             /* Related work */
             result.presenceTable = _presence_of_element(element, 'table');
@@ -31,6 +33,31 @@
             result.numberTextNodes = _number_of_textnodes(element);
             result.proportionNumberTextNodes = _proportion_number_in_textnodes(element);
             result.percentLinks = _80_percent_links(element);
+            return result;
+        }
+        function _depth (element) {
+            var max = 0, depth_i;
+            if (!element.children)
+                return 1;
+            if (element.children.length === 0)
+                return 1;
+            for (var i = 0; i < element.children.length; i++) {
+                depth_i = _depth(element.children[i]);
+                if (depth_i > max)
+                    max = depth_i;
+            };
+            return max + 1;
+        }
+        function _wide (element) {
+            var result = 0, wide_i;
+            if (!element.children)
+                return 1;
+            if (element.children.length === 0)
+                return 1;
+            for (var i = 0; i < element.children.length; i++) {
+                wide_i = _wide(element.children[i]);
+                result += wide_i;
+            };
             return result;
         }
         function _number_of_words (element) {

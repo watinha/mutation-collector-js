@@ -96,7 +96,7 @@ page.open(system.args[1], function () {
             })();
         }
         chain.add(function () {
-            var csv = 'activator-id,mutation-id,displayed,height,width,top,left,activatorTop,activatorLeft,distanceTop,distanceLeft,distance,numberElements,elements/size,numberWords,textNodes,Words/TextNodes,table,list,input,widgetName,date,img,proportionNumbers,links80percent,Result\n',
+            var csv = 'activator-id,mutation-id,displayed,height,width,top,left,activatorTop,activatorLeft,distanceTop,distanceLeft,distance,numberElements,elements/size,numberWords,textNodes,Words/TextNodes,depth,wide,table,list,input,widgetName,date,img,proportionNumbers,links80percent,Result\n',
                 row, serial, distanceTop, distanceLeft, distance;
             for (var i = 0; i < mutations_list.length; i++) {
                 row = mutations_list[i];
@@ -127,6 +127,8 @@ page.open(system.args[1], function () {
                     serial.push(0);
                 else
                     serial.push(row.numberOfWords / row.numberTextNodes);
+                serial.push(row.depth);
+                serial.push(row.wide);
                 serial.push(row.presenceTable);
                 serial.push(row.presenceUl);
                 serial.push(row.presenceInput);
