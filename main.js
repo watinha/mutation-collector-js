@@ -86,6 +86,7 @@ page.open(system.args[1], function () {
                                  mutations[i].changeId = i;
                                  mutations[i].activator = target;
                                  mutations_list.push(mutations[i]);
+                                 //console.log(mutations[i].childs[0].top_sd);
                              };
                              fs.write('output/' + index + '.activator.txt', target.html, 'w');
                              fs.write('output/' + index + '.widgets.txt', output, 'w');

@@ -15,6 +15,42 @@
         var added_elements = [],
             all_elements = null;
 
+        function _childs (element) {
+            var result = [], children = (element.children ? element.children : []);
+
+            if (children.length === 0)
+                return [];
+
+            result.push(_calculate_childs_data(children, element));
+            return result;
+        }
+        function _calculate_childs_data (children, element) {
+            var attributes = ["width", "height", "numberOfElements", "top", "left"],
+                result;
+
+            result = {
+                html: element.outerHTML,
+                number_childs: children.length
+            };
+
+            for (var j = 0; j < attributes.length; j++) {
+                var avg = 0, meta_data,
+                    sd = 0;
+                for (var i = 0; i < children.length; i++) {
+                    meta_data = _meta_data(children[i]);
+                    avg += meta_data[attributes[j]];
+                };
+                avg = avg / children.length;
+                for (var i = 0; i < children.length; i++) {
+                    meta_data = _meta_data(children[i]);
+                    sd += Math.pow(avg - meta_data[attributes[j]], 2);
+                };
+                sd = Math.sqrt(sd / children.length);
+                result[attributes[j] + "_avg"] = avg;
+                result[attributes[j] + "_sd"] = sd;
+            };
+            return result;
+        }
         function _meta_data(element) {
             var result = _position(element);
             result.html = element.outerHTML;
@@ -194,6 +230,7 @@
                 var result = [];
                 for (var i = 0; i < added_elements.length; i++) {
                     result.push(_meta_data(added_elements[i]));
+                    result[i].childs = _childs(added_elements[i]);
                 };
                 added_elements = [];
                 return result;
